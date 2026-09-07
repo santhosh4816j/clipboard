@@ -8,10 +8,10 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 /// Windows' RegisterHotKey API under the hood.
 class HotkeyService {
   HotkeyService._();
+
   static final HotkeyService instance = HotkeyService._();
 
   bool _registered = false;
-  HotKey? _current;
 
   bool get isRegistered => _registered;
 
@@ -26,21 +26,27 @@ class HotkeyService {
   }) async {
     try {
       await unregisterAll();
+
       final hotKey = HotKey(
         key: key,
         modifiers: modifiers,
         scope: HotKeyScope.system,
       );
+
       await hotKeyManager.register(
         hotKey,
         keyDownHandler: (_) => onTrigger(),
       );
-      _current = hotKey;
+
       _registered = true;
       return true;
     } catch (e) {
-      developer.log('Global hotkey registration failed',
-          name: 'ClipHold.Hotkey', error: e);
+      developer.log(
+        'Global hotkey registration failed',
+        name: 'ClipHold.Hotkey',
+        error: e,
+      );
+
       _registered = false;
       return false;
     }
@@ -50,10 +56,13 @@ class HotkeyService {
     try {
       await hotKeyManager.unregisterAll();
     } catch (e) {
-      developer.log('Failed to unregister hotkeys', name: 'ClipHold.Hotkey', error: e);
+      developer.log(
+        'Failed to unregister hotkeys',
+        name: 'ClipHold.Hotkey',
+        error: e,
+      );
     } finally {
       _registered = false;
-      _current = null;
     }
   }
 }
