@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Owns the single SQLite connection used by the whole app.
@@ -13,6 +12,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 /// row counts / ids / error types are ever written to the log.
 class DatabaseService {
   DatabaseService._();
+
   static final DatabaseService instance = DatabaseService._();
 
   /// Test-only constructor: wraps an already-open database (e.g. an
@@ -25,7 +25,10 @@ class DatabaseService {
   bool _ffiInitialized = false;
 
   Future<Database> get database async {
-    if (_db != null) return _db!;
+    if (_db != null) {
+      return _db!;
+    }
+
     _db = await _open();
     return _db!;
   }
@@ -39,9 +42,11 @@ class DatabaseService {
 
     final dir = await getApplicationSupportDirectory();
     final dbDir = Directory(p.join(dir.path, 'ClipHold'));
+
     if (!await dbDir.exists()) {
       await dbDir.create(recursive: true);
     }
+
     final dbPath = p.join(dbDir.path, 'cliphold.db');
 
     try {
@@ -54,7 +59,11 @@ class DatabaseService {
         },
       );
     } catch (e) {
-      developer.log('Failed to open database', name: 'ClipHold.DB', error: e);
+      developer.log(
+        'Failed to open database',
+        name: 'ClipHold.DB',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -78,10 +87,22 @@ class DatabaseService {
         copy_count INTEGER NOT NULL DEFAULT 1
       )
     ''');
-    await db.execute('CREATE INDEX idx_clips_hash ON clips(content_hash)');
-    await db.execute('CREATE INDEX idx_clips_created ON clips(created_at)');
-    await db.execute('CREATE INDEX idx_clips_pinned ON clips(pinned)');
-    await db.execute('CREATE INDEX idx_clips_category ON clips(category)');
+
+    await db.execute(
+      'CREATE INDEX idx_clips_hash ON clips(content_hash)',
+    );
+
+    await db.execute(
+      'CREATE INDEX idx_clips_created ON clips(created_at)',
+    );
+
+    await db.execute(
+      'CREATE INDEX idx_clips_pinned ON clips(pinned)',
+    );
+
+    await db.execute(
+      'CREATE INDEX idx_clips_category ON clips(category)',
+    );
 
     await db.execute('''
       CREATE TABLE snippets (
@@ -95,7 +116,10 @@ class DatabaseService {
         pinned INTEGER NOT NULL DEFAULT 0
       )
     ''');
-    await db.execute('CREATE INDEX idx_snippets_name ON snippets(name)');
+
+    await db.execute(
+      'CREATE INDEX idx_snippets_name ON snippets(name)',
+    );
 
     // Full-text search over clip content for fast offline search.
     await db.execute('''
@@ -106,20 +130,48 @@ class DatabaseService {
         content_rowid='rowid'
       )
     ''');
+
     await db.execute('''
       CREATE TRIGGER clips_ai AFTER INSERT ON clips BEGIN
-        INSERT INTO clips_fts(rowid, id, content) VALUES (new.rowid, new.id, new.content);
+        INSERT INTO clips_fts(rowid, id, content)
+        VALUES (new.rowid, new.id, new.content);
       END;
     ''');
+
     await db.execute('''
       CREATE TRIGGER clips_ad AFTER DELETE ON clips BEGIN
-        INSERT INTO clips_fts(clips_fts, rowid, id, content) VALUES('delete', old.rowid, old.id, old.content);
+        INSERT INTO clips_fts(
+          clips_fts,
+          rowid,
+          id,
+          content
+        )
+        VALUES (
+          'delete',
+          old.rowid,
+          old.id,
+          old.content
+        );
       END;
     ''');
+
     await db.execute('''
       CREATE TRIGGER clips_au AFTER UPDATE ON clips BEGIN
-        INSERT INTO clips_fts(clips_fts, rowid, id, content) VALUES('delete', old.rowid, old.id, old.content);
-        INSERT INTO clips_fts(rowid, id, content) VALUES (new.rowid, new.id, new.content);
+        INSERT INTO clips_fts(
+          clips_fts,
+          rowid,
+          id,
+          content
+        )
+        VALUES (
+          'delete',
+          old.rowid,
+          old.id,
+          old.content
+        );
+
+        INSERT INTO clips_fts(rowid, id, content)
+        VALUES (new.rowid, new.id, new.content);
       END;
     ''');
   }
