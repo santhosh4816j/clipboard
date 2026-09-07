@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/clip_item.dart';
+import '../models/enums.dart';
 import '../utils/ui_helpers.dart';
 
 class ClipboardCard extends StatelessWidget {
@@ -41,8 +42,11 @@ class ClipboardCard extends StatelessWidget {
                       color: scheme.primaryContainer.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(categoryIcon(item.category.label),
-                        size: 15, color: scheme.primary),
+                    child: Icon(
+                      categoryIcon(item.category.label),
+                      size: 15,
+                      color: scheme.primary,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(
@@ -53,30 +57,41 @@ class ClipboardCard extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(width: 8),
-                  Text('•', style: TextStyle(color: scheme.outlineVariant)),
+                  Text(
+                    '•',
+                    style: TextStyle(color: scheme.outlineVariant),
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     formatRelativeTime(item.updatedAt),
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: scheme.onSurfaceVariant),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: scheme.onSurfaceVariant,
+                        ),
                   ),
                   if (item.copyCount > 1) ...[
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
                         color: scheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text('×${item.copyCount}',
-                          style: Theme.of(context).textTheme.bodySmall),
+                      child: Text(
+                        '×${item.copyCount}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   ],
                   const Spacer(),
                   if (item.pinned)
-                    Icon(Icons.push_pin_rounded, size: 15, color: scheme.primary),
+                    Icon(
+                      Icons.push_pin_rounded,
+                      size: 15,
+                      color: scheme.primary,
+                    ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -85,7 +100,8 @@ class ClipboardCard extends StatelessWidget {
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: item.category.label == 'Code' ? 'Consolas' : null,
+                      fontFamily:
+                          item.category.label == 'Code' ? 'Consolas' : null,
                     ),
               ),
               const SizedBox(height: 6),
@@ -144,9 +160,17 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     Color? color;
-    if (danger) color = scheme.error.withValues(alpha: 0.85);
-    if (active) color = scheme.primary;
+
+    if (danger) {
+      color = scheme.error.withValues(alpha: 0.85);
+    }
+
+    if (active) {
+      color = scheme.primary;
+    }
+
     return Tooltip(
       message: tooltip,
       child: IconButton(
