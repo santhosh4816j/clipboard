@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../models/enums.dart';
 import '../providers/app_state.dart';
 import '../utils/ui_helpers.dart';
 
-/// The compact overlay shown when the user presses Alt+V. Rendered as the
-/// full content of the (resized, frameless, always-on-top) native window
-/// in popup mode — see WindowService.
 class QuickPastePopup extends StatefulWidget {
   const QuickPastePopup({super.key});
 
@@ -23,6 +21,7 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
@@ -37,7 +36,10 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
   }
 
   void _handleKey(AppState app, KeyEvent event) {
-    if (event is! KeyDownEvent) return;
+    if (event is! KeyDownEvent) {
+      return;
+    }
+
     if (event.logicalKey == LogicalKeyboardKey.escape) {
       app.closeQuickPastePopup();
     } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
@@ -53,10 +55,13 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
   }
 
   void _scrollToSelection(AppState app) {
-    // Simple approximate scroll: each card ~ 70px tall.
     final target = app.popupSelectedIndex * 72.0;
+
     _scrollController.animateTo(
-      target.clamp(0, _scrollController.position.maxScrollExtent),
+      target.clamp(
+        0,
+        _scrollController.position.maxScrollExtent,
+      ),
       duration: const Duration(milliseconds: 120),
       curve: Curves.easeOut,
     );
@@ -90,7 +95,9 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
-            _PopupHeader(onClose: app.closeQuickPastePopup),
+            _PopupHeader(
+              onClose: app.closeQuickPastePopup,
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 4, 14, 10),
               child: TextField(
@@ -98,8 +105,12 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
                 autofocus: true,
                 onChanged: app.setPopupSearchQuery,
                 decoration: const InputDecoration(
-                  hintText: 'Search clips… (↑↓ to navigate, Enter to paste)',
-                  prefixIcon: Icon(Icons.search_rounded, size: 18),
+                  hintText:
+                      'Search clips… (↑↓ to navigate, Enter to paste)',
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    size: 18,
+                  ),
                   isDense: true,
                 ),
                 style: const TextStyle(fontSize: 13.5),
@@ -111,15 +122,21 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
                   ? const EmptyStateView(
                       icon: Icons.content_paste_off_rounded,
                       title: 'No clips found',
-                      message: 'Copy something with Ctrl+C, it will show up here.',
+                      message:
+                          'Copy something with Ctrl+C, it will show up here.',
                     )
                   : ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 8,
+                      ),
                       itemCount: items.length,
                       itemBuilder: (context, index) {
                         final item = items[index];
-                        final isSelected = index == app.popupSelectedIndex;
+                        final isSelected =
+                            index == app.popupSelectedIndex;
+
                         return _PopupItemTile(
                           content: item.preview,
                           categoryLabel: item.category.label,
@@ -134,13 +151,24 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
                     ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 8,
+              ),
               decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.5))),
+                border: Border(
+                  top: BorderSide(
+                    color: scheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.keyboard_rounded, size: 14, color: scheme.onSurfaceVariant),
+                  Icon(
+                    Icons.keyboard_rounded,
+                    size: 14,
+                    color: scheme.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Enter to paste · Esc to close',
@@ -159,22 +187,36 @@ class _QuickPastePopupState extends State<QuickPastePopup> {
 }
 
 class _PopupHeader extends StatelessWidget {
-  const _PopupHeader({required this.onClose});
+  const _PopupHeader({
+    required this.onClose,
+  });
+
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 12, 8, 6),
       child: Row(
         children: [
-          Icon(Icons.content_paste_rounded, size: 16, color: scheme.primary),
+          Icon(
+            Icons.content_paste_rounded,
+            size: 16,
+            color: scheme.primary,
+          ),
           const SizedBox(width: 8),
-          Text('ClipHold', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'ClipHold',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.close_rounded, size: 16),
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 16,
+            ),
             visualDensity: VisualDensity.compact,
             onPressed: onClose,
           ),
@@ -202,19 +244,29 @@ class _PopupItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Material(
-        color: selected ? scheme.primaryContainer.withValues(alpha: 0.45) : Colors.transparent,
+        color: selected
+            ? scheme.primaryContainer.withValues(alpha: 0.45)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 9,
+            ),
             child: Row(
               children: [
-                Icon(categoryIcon(categoryLabel), size: 15, color: scheme.onSurfaceVariant),
+                Icon(
+                  categoryIcon(categoryLabel),
+                  size: 15,
+                  color: scheme.onSurfaceVariant,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -226,7 +278,11 @@ class _PopupItemTile extends StatelessWidget {
                 ),
                 if (pinned) ...[
                   const SizedBox(width: 6),
-                  Icon(Icons.push_pin_rounded, size: 13, color: scheme.primary),
+                  Icon(
+                    Icons.push_pin_rounded,
+                    size: 13,
+                    color: scheme.primary,
+                  ),
                 ],
               ],
             ),
