@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../models/snippet.dart';
-import '../utils/ui_helpers.dart';
 
 class SnippetCard extends StatelessWidget {
   const SnippetCard({
@@ -22,6 +21,7 @@ class SnippetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -34,7 +34,11 @@ class SnippetCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.bolt_rounded, size: 16, color: scheme.primary),
+                  Icon(
+                    Icons.bolt_rounded,
+                    size: 16,
+                    color: scheme.primary,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -45,17 +49,26 @@ class SnippetCard extends StatelessWidget {
                   ),
                   if (snippet.shortcut != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: scheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(snippet.shortcut!,
-                          style: Theme.of(context).textTheme.bodySmall),
+                      child: Text(
+                        snippet.shortcut!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   if (snippet.pinned) ...[
                     const SizedBox(width: 6),
-                    Icon(Icons.push_pin_rounded, size: 15, color: scheme.primary),
+                    Icon(
+                      Icons.push_pin_rounded,
+                      size: 15,
+                      color: scheme.primary,
+                    ),
                   ],
                 ],
               ),
@@ -72,14 +85,19 @@ class SnippetCard extends StatelessWidget {
                 children: [
                   IconButton(
                     tooltip: 'Copy',
-                    icon: const Icon(Icons.copy_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.copy_rounded,
+                      size: 18,
+                    ),
                     visualDensity: VisualDensity.compact,
                     onPressed: onCopy,
                   ),
                   IconButton(
                     tooltip: snippet.pinned ? 'Unpin' : 'Pin',
                     icon: Icon(
-                      snippet.pinned ? Icons.push_pin_rounded : Icons.push_pin_outlined,
+                      snippet.pinned
+                          ? Icons.push_pin_rounded
+                          : Icons.push_pin_outlined,
                       size: 18,
                     ),
                     color: snippet.pinned ? scheme.primary : null,
@@ -88,13 +106,19 @@ class SnippetCard extends StatelessWidget {
                   ),
                   IconButton(
                     tooltip: 'Edit',
-                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                    ),
                     visualDensity: VisualDensity.compact,
                     onPressed: onEdit,
                   ),
                   IconButton(
                     tooltip: 'Delete',
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 18,
+                    ),
                     color: scheme.error.withValues(alpha: 0.85),
                     visualDensity: VisualDensity.compact,
                     onPressed: onDelete,
